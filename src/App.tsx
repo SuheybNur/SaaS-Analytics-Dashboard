@@ -1,121 +1,204 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import Skeleton from './components/Skeleton'
+
+type DashboardStat = {
+  label: string
+  value: string
+  description: string
+}
+
+type ProjectRow = {
+  name: string
+  category: string
+  owner: string
+  status: 'Active' | 'Completed' | 'At risk'
+  progress: number
+}
+
+const statCards: DashboardStat[] = [
+  { label: 'Metric A', value: '00', description: 'Placeholder description' },
+  { label: 'Metric B', value: '00', description: 'Placeholder description' },
+  { label: 'Metric C', value: '00', description: 'Placeholder description' },
+  { label: 'Metric D', value: '00', description: 'Placeholder description' },
+]
+
+const projectRows: ProjectRow[] = [
+  { name: 'Item 1', category: 'Type A', owner: 'User A', status: 'Active', progress: 0 },
+  { name: 'Item 2', category: 'Type B', owner: 'User B', status: 'At risk', progress: 0 },
+  { name: 'Item 3', category: 'Type C', owner: 'User C', status: 'Completed', progress: 0 },
+  { name: 'Item 4', category: 'Type D', owner: 'User D', status: 'Active', progress: 0 },
+  { name: 'Item 5', category: 'Type E', owner: 'User E', status: 'Active', progress: 0 },
+  { name: 'Item 6', category: 'Type F', owner: 'User F', status: 'Completed', progress: 0 },
+  { name: 'Item 7', category: 'Type G', owner: 'User G', status: 'At risk', progress: 0 },
+  { name: 'Item 8', category: 'Type H', owner: 'User H', status: 'Active', progress: 0 },
+  { name: 'Item 9', category: 'Type I', owner: 'User I', status: 'Completed', progress: 0 },
+  { name: 'Item 10', category: 'Type J', owner: 'User J', status: 'Active', progress: 0 },
+]
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [activePage] = useState(1)
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setLoading(false), 1000)
+    return () => window.clearTimeout(timer)
+  }, [])
+
+  const filteredProjects = useMemo(() => {
+    if (!searchTerm.trim()) return projectRows
+    return projectRows.filter((row) =>
+      [row.name, row.category, row.owner, row.status]
+        .join(' ')
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()),
+    )
+  }, [searchTerm])
+
+  const visibleRows = filteredProjects.slice((activePage - 1) * 10, activePage * 10)
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
+    <main className="dashboard-shell">
+      <header className="dashboard-header">
         <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
+          <p className="eyebrow">Placeholder</p>
+          <h1>Placeholder dashboard.</h1>
         </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
+        <div className="login-pill">Placeholder login</div>
+      </header>
+
+      <section className="stat-grid">
+        {loading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <article key={index} className="stat-card">
+                <Skeleton height="1.5rem" width="35%" className="skeleton-heading" />
+                <Skeleton height="3rem" width="60%" className="skeleton-value" />
+                <Skeleton height="1rem" width="85%" className="skeleton-text" />
+              </article>
+            ))
+          : statCards.map((stat) => (
+              <article key={stat.label} className="stat-card">
+                <p className="stat-label">{stat.label}</p>
+                <p className="stat-value">{stat.value}</p>
+                <p className="stat-note">{stat.description}</p>
+              </article>
+            ))}
       </section>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+      <section className="chart-section">
+        <div className="chart-card">
+          <div className="chart-card-header">
+            <p>Placeholder chart</p>
+            <span>Placeholder</span>
+          </div>
+          {loading ? (
+            <Skeleton variant="rect" className="chart-skeleton" />
+          ) : (
+            <div className="chart-placeholder">
+              <div className="chart-point">A</div>
+              <div className="chart-point active">B</div>
+              <div className="chart-point">C</div>
+              <div className="chart-point">D</div>
+            </div>
+          )}
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+
+        <div className="chart-card">
+          <div className="chart-card-header">
+            <p>Placeholder chart</p>
+            <span>Placeholder</span>
+          </div>
+          {loading ? (
+            <Skeleton variant="rect" className="chart-skeleton" />
+          ) : (
+            <div className="chart-bars">
+              <div>
+                <span>Type A</span>
+                <div className="bar ui" />
+              </div>
+              <div>
+                <span>Type B</span>
+                <div className="bar backend" />
+              </div>
+              <div>
+                <span>Type C</span>
+                <div className="bar ops" />
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
+      <section className="table-section">
+        <div className="table-toolbar">
+          <div>
+            <h2>Placeholder table</h2>
+            <p>Placeholder details.</p>
+          </div>
+          <input
+            type="search"
+            placeholder="Search"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            disabled={loading}
+          />
+        </div>
+
+        <div className="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>Item</th>
+                <th>Type</th>
+                <th>Owner</th>
+                <th>State</th>
+                <th>Rate</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading
+                ? Array.from({ length: 10 }).map((_, index) => (
+                    <tr key={index} className="table-row-skeleton">
+                      <td>
+                        <Skeleton height="1rem" width="70%" />
+                      </td>
+                      <td>
+                        <Skeleton height="1rem" width="50%" />
+                      </td>
+                      <td>
+                        <Skeleton height="1rem" width="60%" />
+                      </td>
+                      <td>
+                        <Skeleton height="1rem" width="55%" />
+                      </td>
+                      <td>
+                        <Skeleton height="1rem" width="80%" />
+                      </td>
+                    </tr>
+                  ))
+                : visibleRows.map((row) => (
+                    <tr key={row.name}>
+                      <td>{row.name}</td>
+                      <td>{row.category}</td>
+                      <td>{row.owner}</td>
+                      <td>
+                        <span className={`status-badge ${row.status.replace(' ', '-').toLowerCase()}`}>
+                          Placeholder
+                        </span>
+                      </td>
+                      <td>00%</td>
+                    </tr>
+                  ))}
+            </tbody>
+          </table>
+
+          {!loading && filteredProjects.length === 0 && (
+            <div className="empty-state">No matches.</div>
+          )}
+        </div>
+      </section>
+    </main>
   )
 }
 
