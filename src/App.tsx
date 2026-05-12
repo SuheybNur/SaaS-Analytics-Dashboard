@@ -63,7 +63,7 @@ function App() {
       <header className="dashboard-header">
         <div>
           <p className="eyebrow">Placeholder</p>
-          <h1>Placeholder dashboard</h1>
+          <h1>Placeholder dashboard.</h1>
         </div>
         <div className="login-pill">Placeholder login</div>
       </header>
