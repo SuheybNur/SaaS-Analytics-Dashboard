@@ -1,7 +1,24 @@
 .dashboard-shell {
-  max-width: 1180px;
+  flex: 1;
+  min-width: 0;
+  max-width: min(1180px, calc(100vw - 320px));
   margin: 0 auto;
   padding: 32px 24px 48px;
+  width: 100%;
+}
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+  background: #f8fafc;
+}
+
+@media (min-width: 1180px) {
+  .dashboard-shell {
+    max-width: calc(100vw - 320px);
+  }
 }
 
 body {
@@ -293,6 +310,15 @@ tbody tr:last-child td {
 }
 
 @media (max-width: 900px) {
+  .app-layout {
+    display: block;
+  }
+
+  .dashboard-shell {
+    max-width: 100%;
+    padding: 24px 18px 48px;
+  }
+
   .stat-grid,
   .chart-section {
     grid-template-columns: 1fr;
