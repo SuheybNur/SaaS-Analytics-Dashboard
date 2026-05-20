@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import Sidebar from './components/Sidebar'
 import Skeleton from './components/Skeleton'
 
 type DashboardStat = {
@@ -15,6 +16,9 @@ type ProjectRow = {
   status: 'Active' | 'Completed' | 'At risk'
   progress: number
 }
+
+type ThemeMode = 'light' | 'dark'
+const STORAGE_KEY = 'theme-preference'
 
 const statCards: DashboardStat[] = [
   { label: 'Metric A', value: '00', description: 'Placeholder description' },
@@ -40,6 +44,19 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [activePage] = useState(1)
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') return 'light'
+    const stored = localStorage.getItem(STORAGE_KEY) as ThemeMode | null
+    if (stored === 'light' || stored === 'dark') return stored
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  })
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('dark', theme === 'dark')
+    root.dataset.theme = theme
+    localStorage.setItem(STORAGE_KEY, theme)
+  }, [theme])
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 1000)
@@ -59,13 +76,26 @@ function App() {
   const visibleRows = filteredProjects.slice((activePage - 1) * 10, activePage * 10)
 
   return (
-    <main className="dashboard-shell">
+    <div className="app-layout">
+      <Sidebar />
+      <main className="dashboard-shell">
       <header className="dashboard-header">
         <div>
           <p className="eyebrow">Placeholder</p>
           <h1>Placeholder dashboard.</h1>
         </div>
-        <div className="login-pill">Placeholder login</div>
+
+        <div className="header-actions">
+          <button
+            type="button"
+            className="theme-toggle"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            aria-label="Toggle dark mode"
+          >
+            {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+          </button>
+          <div className="login-pill">Placeholder login</div>
+        </div>
       </header>
 
       <section className="stat-grid">
@@ -198,7 +228,8 @@ function App() {
           )}
         </div>
       </section>
-    </main>
+      </main>
+    </div>
   )
 }
 

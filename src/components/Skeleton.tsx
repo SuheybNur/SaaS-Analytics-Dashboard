@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes } from 'react'
+import type { HTMLAttributes } from 'react'
 
 interface SkeletonProps extends HTMLAttributes<HTMLSpanElement> {
   width?: string
