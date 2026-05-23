@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import Sidebar from './components/Sidebar'
 import Skeleton from './components/Skeleton'
+import Login from './components/Login'
 
 type DashboardStat = {
   label: string
@@ -15,6 +17,11 @@ type ProjectRow = {
   status: 'Active' | 'Completed' | 'At risk'
   progress: number
 }
+
+type ThemeMode = 'light' | 'dark'
+
+const AUTH_KEY = 'saas-dashboard-auth'
+const THEME_KEY = 'theme-preference'
 
 const statCards: DashboardStat[] = [
   { label: 'Metric A', value: '00', description: 'Placeholder description' },
@@ -37,6 +44,16 @@ const projectRows: ProjectRow[] = [
 ]
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(() => {
+    if (typeof window === 'undefined') return false
+    return localStorage.getItem(AUTH_KEY) === 'true'
+  })
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') return 'light'
+    const stored = localStorage.getItem(THEME_KEY)
+    if (stored === 'light' || stored === 'dark') return stored
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  })
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [activePage] = useState(1)
@@ -45,6 +62,21 @@ function App() {
     const timer = window.setTimeout(() => setLoading(false), 1000)
     return () => window.clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('dark', theme === 'dark')
+    root.dataset.theme = theme
+    localStorage.setItem(THEME_KEY, theme)
+  }, [theme])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      localStorage.setItem(AUTH_KEY, 'true')
+    } else {
+      localStorage.removeItem(AUTH_KEY)
+    }
+  }, [isAuthenticated])
 
   const filteredProjects = useMemo(() => {
     if (!searchTerm.trim()) return projectRows
@@ -58,147 +90,165 @@ function App() {
 
   const visibleRows = filteredProjects.slice((activePage - 1) * 10, activePage * 10)
 
+  if (!isAuthenticated) {
+    return <Login onSuccess={() => setIsAuthenticated(true)} />
+  }
+
   return (
-    <main className="dashboard-shell">
-      <header className="dashboard-header">
-        <div>
-          <p className="eyebrow">Placeholder</p>
-          <h1>Placeholder dashboard.</h1>
-        </div>
-        <div className="login-pill">Placeholder login</div>
-      </header>
-
-      <section className="stat-grid">
-        {loading
-          ? Array.from({ length: 4 }).map((_, index) => (
-              <article key={index} className="stat-card">
-                <Skeleton height="1.5rem" width="35%" className="skeleton-heading" />
-                <Skeleton height="3rem" width="60%" className="skeleton-value" />
-                <Skeleton height="1rem" width="85%" className="skeleton-text" />
-              </article>
-            ))
-          : statCards.map((stat) => (
-              <article key={stat.label} className="stat-card">
-                <p className="stat-label">{stat.label}</p>
-                <p className="stat-value">{stat.value}</p>
-                <p className="stat-note">{stat.description}</p>
-              </article>
-            ))}
-      </section>
-
-      <section className="chart-section">
-        <div className="chart-card">
-          <div className="chart-card-header">
-            <p>Placeholder chart</p>
-            <span>Placeholder</span>
-          </div>
-          {loading ? (
-            <Skeleton variant="rect" className="chart-skeleton" />
-          ) : (
-            <div className="chart-placeholder">
-              <div className="chart-point">A</div>
-              <div className="chart-point active">B</div>
-              <div className="chart-point">C</div>
-              <div className="chart-point">D</div>
-            </div>
-          )}
-        </div>
-
-        <div className="chart-card">
-          <div className="chart-card-header">
-            <p>Placeholder chart</p>
-            <span>Placeholder</span>
-          </div>
-          {loading ? (
-            <Skeleton variant="rect" className="chart-skeleton" />
-          ) : (
-            <div className="chart-bars">
-              <div>
-                <span>Type A</span>
-                <div className="bar ui" />
-              </div>
-              <div>
-                <span>Type B</span>
-                <div className="bar backend" />
-              </div>
-              <div>
-                <span>Type C</span>
-                <div className="bar ops" />
-              </div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      <section className="table-section">
-        <div className="table-toolbar">
+    <div className="app-layout">
+      <Sidebar />
+      <main className="dashboard-shell">
+        <header className="dashboard-header">
           <div>
-            <h2>Placeholder table</h2>
-            <p>Placeholder details.</p>
+            <p className="eyebrow">Placeholder</p>
+            <h1>Placeholder dashboard.</h1>
           </div>
-          <input
-            type="search"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            disabled={loading}
-          />
-        </div>
+          <div className="header-actions">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </button>
+            <button className="logout-button" onClick={() => setIsAuthenticated(false)}>
+              Logout
+            </button>
+          </div>
+        </header>
 
-        <div className="table-card">
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Type</th>
-                <th>Owner</th>
-                <th>State</th>
-                <th>Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading
-                ? Array.from({ length: 10 }).map((_, index) => (
-                    <tr key={index} className="table-row-skeleton">
-                      <td>
-                        <Skeleton height="1rem" width="70%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="50%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="60%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="55%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="80%" />
-                      </td>
-                    </tr>
-                  ))
-                : visibleRows.map((row) => (
-                    <tr key={row.name}>
-                      <td>{row.name}</td>
-                      <td>{row.category}</td>
-                      <td>{row.owner}</td>
-                      <td>
-                        <span className={`status-badge ${row.status.replace(' ', '-').toLowerCase()}`}>
-                          Placeholder
-                        </span>
-                      </td>
-                      <td>00%</td>
-                    </tr>
-                  ))}
-            </tbody>
-          </table>
+        <section className="stat-grid">
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <article key={index} className="stat-card">
+                  <Skeleton height="1.5rem" width="35%" className="skeleton-heading" />
+                  <Skeleton height="3rem" width="60%" className="skeleton-value" />
+                  <Skeleton height="1rem" width="85%" className="skeleton-text" />
+                </article>
+              ))
+            : statCards.map((stat) => (
+                <article key={stat.label} className="stat-card">
+                  <p className="stat-label">{stat.label}</p>
+                  <p className="stat-value">{stat.value}</p>
+                  <p className="stat-note">{stat.description}</p>
+                </article>
+              ))}
+        </section>
 
-          {!loading && filteredProjects.length === 0 && (
-            <div className="empty-state">No matches.</div>
-          )}
-        </div>
-      </section>
-    </main>
+        <section className="chart-section">
+          <div className="chart-card">
+            <div className="chart-card-header">
+              <p>Placeholder chart</p>
+              <span>Placeholder</span>
+            </div>
+            {loading ? (
+              <Skeleton variant="rect" className="chart-skeleton" />
+            ) : (
+              <div className="chart-placeholder">
+                <div className="chart-point">A</div>
+                <div className="chart-point active">B</div>
+                <div className="chart-point">C</div>
+                <div className="chart-point">D</div>
+              </div>
+            )}
+          </div>
+
+          <div className="chart-card">
+            <div className="chart-card-header">
+              <p>Placeholder chart</p>
+              <span>Placeholder</span>
+            </div>
+            {loading ? (
+              <Skeleton variant="rect" className="chart-skeleton" />
+            ) : (
+              <div className="chart-bars">
+                <div>
+                  <span>Type A</span>
+                  <div className="bar ui" />
+                </div>
+                <div>
+                  <span>Type B</span>
+                  <div className="bar backend" />
+                </div>
+                <div>
+                  <span>Type C</span>
+                  <div className="bar ops" />
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+
+        <section className="table-section">
+          <div className="table-toolbar">
+            <div>
+              <h2>Placeholder table</h2>
+              <p>Placeholder details.</p>
+            </div>
+            <input
+              type="search"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              disabled={loading}
+            />
+          </div>
+
+          <div className="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Type</th>
+                  <th>Owner</th>
+                  <th>State</th>
+                  <th>Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading
+                  ? Array.from({ length: 10 }).map((_, index) => (
+                      <tr key={index} className="table-row-skeleton">
+                        <td>
+                          <Skeleton height="1rem" width="70%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="50%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="60%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="55%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="80%" />
+                        </td>
+                      </tr>
+                    ))
+                  : visibleRows.map((row) => (
+                      <tr key={row.name}>
+                        <td>{row.name}</td>
+                        <td>{row.category}</td>
+                        <td>{row.owner}</td>
+                        <td>
+                          <span className={`status-badge ${row.status.replace(' ', '-').toLowerCase()}`}>
+                            Placeholder
+                          </span>
+                        </td>
+                        <td>00%</td>
+                      </tr>
+                    ))}
+              </tbody>
+            </table>
+
+            {!loading && filteredProjects.length === 0 && (
+              <div className="empty-state">No matches.</div>
+            )}
+          </div>
+        </section>
+      </main>
+    </div>
   )
 }
 
