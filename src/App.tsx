@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import './App.css'
+import Sidebar from './components/Sidebar'
 import Skeleton from './components/Skeleton'
 
 type DashboardStat = {
@@ -59,14 +60,16 @@ function App() {
   const visibleRows = filteredProjects.slice((activePage - 1) * 10, activePage * 10)
 
   return (
-    <main className="dashboard-shell">
-      <header className="dashboard-header">
-        <div>
-          <p className="eyebrow">Placeholder</p>
-          <h1>Placeholder dashboard.</h1>
-        </div>
-        <div className="login-pill">Placeholder login</div>
-      </header>
+    <div className="app-layout">
+      <Sidebar />
+      <main className="dashboard-shell">
+        <header className="dashboard-header">
+          <div>
+            <p className="eyebrow">Placeholder</p>
+            <h1>Placeholder dashboard.</h1>
+          </div>
+          <div className="login-pill">Placeholder login</div>
+        </header>
 
       <section className="stat-grid">
         {loading
@@ -199,6 +202,7 @@ function App() {
         </div>
       </section>
     </main>
+  </div>
   )
 }
 
