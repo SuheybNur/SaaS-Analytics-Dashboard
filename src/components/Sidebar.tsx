@@ -1,5 +1,4 @@
-import { useEffect, useState } from 'react'
-import './Sidebar.css'
+import { useState } from 'react'
 
 type NavItem = {
   label: string
@@ -17,70 +16,145 @@ export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const [activeItem, setActiveItem] = useState('Dashboard')
 
-  useEffect(() => {
-    function onKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setIsOpen(false)
-      }
-    }
-
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [])
-
   return (
     <>
-      <aside id="sidebar" className={`sidebar ${isOpen ? 'open' : ''}`}>
-        <div className="sidebar-inner">
-          <div className="sidebar-brand">
-            <div className="brand-mark">SA</div>
-            <div className="brand-text">
-              <div className="brand-title">SaaS Analytics</div>
-              <div className="brand-sub">Dashboard</div>
+      {/* Sidebar */}
+      <div
+        style={{
+          position: isOpen ? 'fixed' : 'fixed',
+          left: isOpen ? 0 : -256,
+          top: 0,
+          width: 256,
+          height: '100vh',
+          backgroundColor: '#ffffff',
+          color: '#1e293b',
+          transition: 'left 0.3s ease-in-out',
+          zIndex: 40,
+        }}
+        className="lg:static lg:left-0"
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+          {/* Logo */}
+          <div
+            style={{
+              padding: '24px',
+              borderBottom: '1px solid #e2e8f0',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+            }}
+          >
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                backgroundColor: '#4f46e5',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '12px',
+                fontWeight: 'bold',
+                color: '#ffffff',
+              }}
+            >
+              SA
+            </div>
+            <div>
+              <div style={{ fontWeight: 'bold', fontSize: '14px', color: '#1e293b' }}>
+                Logo Placeholder
+              </div>
+              <div style={{ fontSize: '12px', color: '#64748b' }}>
+                Dashboard
+              </div>
             </div>
           </div>
 
-          <nav className="sidebar-nav" aria-label="Primary navigation">
+          {/* Nav */}
+          <nav style={{ flex: 1, padding: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {navItems.map((item) => (
               <button
                 key={item.label}
-                className={`nav-item ${activeItem === item.label ? 'active' : ''}`}
                 onClick={() => {
                   setActiveItem(item.label)
                   setIsOpen(false)
                 }}
-                aria-current={activeItem === item.label ? 'page' : undefined}
+                style={{
+                  width: '100%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor:
+                    activeItem === item.label ? '#4f46e5' : 'transparent',
+                  color: activeItem === item.label ? '#ffffff' : '#64748b',
+                  fontSize: '14px',
+                  fontWeight: 500,
+                  transition: 'background-color 0.2s',
+                }}
               >
-                <span className="nav-icon" aria-hidden="true">
-                  {item.icon}
-                </span>
-                <span className="nav-label">{item.label}</span>
+                <span style={{ fontSize: '18px' }}>{item.icon}</span>
+                <span>{item.label}</span>
               </button>
             ))}
           </nav>
 
-          <div className="sidebar-footer">© 2026 SaaS Dashboard</div>
+          {/* Footer */}
+          <div
+            style={{
+              padding: '24px',
+              borderTop: '1px solid #e2e8f0',
+              fontSize: '12px',
+              color: '#64748b',
+            }}
+          >
+            © 2026 SaaS Dashboard
+          </div>
         </div>
-      </aside>
+      </div>
 
+      {/* Mobile Toggle */}
       <button
-        type="button"
-        className="sidebar-toggle lg:hidden"
-        aria-expanded={isOpen}
-        aria-controls="sidebar"
-        aria-label={isOpen ? 'Close menu' : 'Open menu'}
-        onClick={() => setIsOpen((value) => !value)}
+        onClick={() => setIsOpen(!isOpen)}
+        style={{
+          position: 'fixed',
+          bottom: '24px',
+          left: '24px',
+          width: '48px',
+          height: '48px',
+          backgroundColor: '#4f46e5',
+          color: '#fff',
+          border: 'none',
+          borderRadius: '8px',
+          cursor: 'pointer',
+          display: isOpen ? 'flex' : 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 50,
+        }}
+        className="lg:hidden"
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
-          {isOpen ? (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          ) : (
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          )}
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
 
-      {isOpen && <div className="sidebar-backdrop lg:hidden" onClick={() => setIsOpen(false)} />}
+      {/* Overlay */}
+      {isOpen && (
+        <div
+          onClick={() => setIsOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            zIndex: 30,
+          }}
+          className="lg:hidden"
+        />
+      )}
     </>
   )
 }
