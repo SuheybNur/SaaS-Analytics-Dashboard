@@ -2,6 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import Skeleton from './components/Skeleton'
+import EmptyState from './components/EmptyState'
+import ErrorState from './components/ErrorState'
 
 type DashboardStat = {
   label: string
@@ -41,11 +43,18 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [activePage] = useState(1)
+  const [hasProjectError, setHasProjectError] = useState(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 1000)
     return () => window.clearTimeout(timer)
   }, [])
+
+  const handleRetryProjects = () => {
+    setHasProjectError(false)
+    setLoading(true)
+    window.setTimeout(() => setLoading(false), 500)
+  }
 
   const filteredProjects = useMemo(() => {
     if (!searchTerm.trim()) return projectRows
@@ -187,18 +196,25 @@ function App() {
                       <td>{row.owner}</td>
                       <td>
                         <span className={`status-badge ${row.status.replace(' ', '-').toLowerCase()}`}>
-                          Placeholder
+                          {row.status}
                         </span>
                       </td>
-                      <td>00%</td>
+                      <td>{row.progress}%</td>
                     </tr>
                   ))}
             </tbody>
           </table>
 
-          {!loading && filteredProjects.length === 0 && (
-            <div className="empty-state">No matches.</div>
-          )}
+          {!loading && hasProjectError ? (
+            <ErrorState onRetry={handleRetryProjects} />
+          ) : !loading && filteredProjects.length === 0 ? (
+            <EmptyState
+              title="No projects match"
+              description="Try changing your search terms or removing filters to see more projects."
+              actionLabel="Reset search"
+              onAction={() => setSearchTerm('')}
+            />
+          ) : null}
         </div>
       </section>
     </main>
