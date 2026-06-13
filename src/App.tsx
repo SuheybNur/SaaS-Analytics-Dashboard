@@ -3,6 +3,11 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import Skeleton from './components/Skeleton'
+import EmptyState from './components/EmptyState'
+import ErrorState from './components/ErrorState'
+import Login from './components/Login'
+import ProtectedRoute from './components/ProtectedRoute'
+import { useAuth } from './auth/useAuth'
 
 type DashboardStat = {
   label: string
@@ -60,6 +65,18 @@ function App() {
     const timer = window.setTimeout(() => setLoading(false), 1000)
     return () => window.clearTimeout(timer)
   }, [])
+
+  useEffect(() => {
+    const root = document.documentElement
+    root.classList.toggle('dark', theme === 'dark')
+    localStorage.setItem(THEME_KEY, theme)
+  }, [theme])
+
+  const handleRetryProjects = () => {
+    setHasProjectError(false)
+    setLoading(true)
+    window.setTimeout(() => setLoading(false), 500)
+  }
 
   const filteredProjects = useMemo(() => {
     if (!searchTerm.trim()) return projectRows
@@ -178,61 +195,68 @@ function App() {
             />
           </div>
 
-        <div className="table-card">
-          <table>
-            <thead>
-              <tr>
-                <th>Item</th>
-                <th>Type</th>
-                <th>Owner</th>
-                <th>State</th>
-                <th>Rate</th>
-              </tr>
-            </thead>
-            <tbody>
-              {loading
-                ? Array.from({ length: 10 }).map((_, index) => (
-                    <tr key={index} className="table-row-skeleton">
-                      <td>
-                        <Skeleton height="1rem" width="70%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="50%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="60%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="55%" />
-                      </td>
-                      <td>
-                        <Skeleton height="1rem" width="80%" />
-                      </td>
-                    </tr>
-                  ))
-                : visibleRows.map((row) => (
-                    <tr key={row.name}>
-                      <td>{row.name}</td>
-                      <td>{row.category}</td>
-                      <td>{row.owner}</td>
-                      <td>
-                        <span className={`status-badge ${row.status.replace(' ', '-').toLowerCase()}`}>
-                          Placeholder
-                        </span>
-                      </td>
-                      <td>00%</td>
-                    </tr>
-                  ))}
-            </tbody>
-          </table>
+          <div className="table-card">
+            <table>
+              <thead>
+                <tr>
+                  <th>Item</th>
+                  <th>Type</th>
+                  <th>Owner</th>
+                  <th>State</th>
+                  <th>Rate</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading
+                  ? Array.from({ length: 10 }).map((_, index) => (
+                      <tr key={index} className="table-row-skeleton">
+                        <td>
+                          <Skeleton height="1rem" width="70%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="50%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="60%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="55%" />
+                        </td>
+                        <td>
+                          <Skeleton height="1rem" width="80%" />
+                        </td>
+                      </tr>
+                    ))
+                  : visibleRows.map((row) => (
+                      <tr key={row.name}>
+                        <td>{row.name}</td>
+                        <td>{row.category}</td>
+                        <td>{row.owner}</td>
+                        <td>
+                          <span className={`status-badge ${row.status.replace(' ', '-').toLowerCase()}`}>
+                            {row.status}
+                          </span>
+                        </td>
+                        <td>{row.progress}%</td>
+                      </tr>
+                    ))}
+              </tbody>
+            </table>
 
-          {!loading && filteredProjects.length === 0 && (
-            <div className="empty-state">No matches.</div>
-          )}
-        </div>
-      </section>
-    </main>
-  </div>
+            {!loading && hasProjectError ? (
+              <ErrorState onRetry={handleRetryProjects} />
+            ) : !loading && filteredProjects.length === 0 ? (
+              <EmptyState
+                title="No projects match"
+                description="Try changing your search terms or removing filters to see more projects."
+                actionLabel="Reset search"
+                onAction={() => setSearchTerm('')}
+              />
+            ) : null}
+          </div>
+        </section>
+      </main>
+    </div>
   )
 
   return (
