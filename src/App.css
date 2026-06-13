@@ -407,6 +407,78 @@ tbody tr:last-child td {
   text-align: center;
 }
 
+.state-card {
+  display: grid;
+  gap: 20px;
+  justify-items: center;
+  padding: 48px 32px;
+  border-radius: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  text-align: center;
+}
+
+.state-icon-wrapper {
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface-muted);
+}
+
+.state-icon {
+  width: 42px;
+  height: 42px;
+}
+
+.state-title {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text);
+}
+
+.state-description {
+  margin: 0;
+  max-width: 34rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+}
+
+.state-actions {
+  width: 100%;
+}
+
+.state-button {
+  width: auto;
+  min-width: 160px;
+  padding: 12px 18px;
+  border-radius: 14px;
+  border: none;
+  background: var(--color-primary);
+  color: var(--color-primary-foreground);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.state-button:hover {
+  background: #4f46e5;
+}
+
+.error-state .state-icon-wrapper {
+  background: #fee2e2;
+}
+
+.error-state .state-button {
+  background: #dc2626;
+}
+
+.error-state .state-button:hover {
+  background: #b91c1c;
+}
+
 .skeleton {
   display: inline-block;
   background: linear-gradient(90deg, rgba(229, 231, 235, 1) 0%, rgba(243, 244, 246, 1) 30%, rgba(229, 231, 235, 1) 100%);

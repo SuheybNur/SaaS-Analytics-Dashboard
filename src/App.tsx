@@ -3,6 +3,8 @@ import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import Skeleton from './components/Skeleton'
+import EmptyState from './components/EmptyState'
+import ErrorState from './components/ErrorState'
 import Login from './components/Login'
 import ProtectedRoute from './components/ProtectedRoute'
 import { useAuth } from './auth/useAuth'
@@ -57,6 +59,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [activePage] = useState(1)
+  const [hasProjectError, setHasProjectError] = useState(false)
 
   useEffect(() => {
     const timer = window.setTimeout(() => setLoading(false), 1000)
@@ -68,6 +71,12 @@ function App() {
     root.classList.toggle('dark', theme === 'dark')
     localStorage.setItem(THEME_KEY, theme)
   }, [theme])
+
+  const handleRetryProjects = () => {
+    setHasProjectError(false)
+    setLoading(true)
+    window.setTimeout(() => setLoading(false), 500)
+  }
 
   const filteredProjects = useMemo(() => {
     if (!searchTerm.trim()) return projectRows
@@ -234,9 +243,16 @@ function App() {
               </tbody>
             </table>
 
-            {!loading && filteredProjects.length === 0 && (
-              <div className="empty-state">No matches.</div>
-            )}
+            {!loading && hasProjectError ? (
+              <ErrorState onRetry={handleRetryProjects} />
+            ) : !loading && filteredProjects.length === 0 ? (
+              <EmptyState
+                title="No projects match"
+                description="Try changing your search terms or removing filters to see more projects."
+                actionLabel="Reset search"
+                onAction={() => setSearchTerm('')}
+              />
+            ) : null}
           </div>
         </section>
       </main>
