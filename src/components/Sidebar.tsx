@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './Sidebar.css'
 
 type NavItem = {
@@ -16,24 +16,21 @@ const navItems: NavItem[] = [
 export default function Sidebar() {
   const [isOpen, setIsOpen] = useState(false)
   const [activeItem, setActiveItem] = useState('Dashboard')
-  const panelRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setIsOpen(false)
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setIsOpen(false)
+      }
     }
+
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
   return (
     <>
-      <aside
-        id="sidebar"
-        ref={panelRef}
-        className={`sidebar ${isOpen ? 'open' : ''}`}
-        aria-hidden={!isOpen && window.innerWidth < 1024}
-      >
+      <aside id="sidebar" className={`sidebar ${isOpen ? 'open' : ''}`}>
         <div className="sidebar-inner">
           <div className="sidebar-brand">
             <div className="brand-mark">SA</div>
@@ -43,7 +40,7 @@ export default function Sidebar() {
             </div>
           </div>
 
-          <nav className="sidebar-nav" aria-label="Main navigation">
+          <nav className="sidebar-nav" aria-label="Primary navigation">
             {navItems.map((item) => (
               <button
                 key={item.label}
@@ -54,7 +51,7 @@ export default function Sidebar() {
                 }}
                 aria-current={activeItem === item.label ? 'page' : undefined}
               >
-                <span className="nav-icon" aria-hidden>
+                <span className="nav-icon" aria-hidden="true">
                   {item.icon}
                 </span>
                 <span className="nav-label">{item.label}</span>
@@ -67,13 +64,14 @@ export default function Sidebar() {
       </aside>
 
       <button
+        type="button"
         className="sidebar-toggle lg:hidden"
         aria-expanded={isOpen}
         aria-controls="sidebar"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
-        onClick={() => setIsOpen((s) => !s)}
+        onClick={() => setIsOpen((value) => !value)}
       >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
           {isOpen ? (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           ) : (
