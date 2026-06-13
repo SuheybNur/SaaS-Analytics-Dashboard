@@ -1,9 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import Sidebar from './components/Sidebar'
 import Skeleton from './components/Skeleton'
-import EmptyState from './components/EmptyState'
-import ErrorState from './components/ErrorState'
 
 type DashboardStat = {
   label: string
@@ -18,6 +17,10 @@ type ProjectRow = {
   status: 'Active' | 'Completed' | 'At risk'
   progress: number
 }
+
+type ThemeMode = 'light' | 'dark'
+
+const THEME_KEY = 'saas-dashboard-theme'
 
 const statCards: DashboardStat[] = [
   { label: 'Metric A', value: '00', description: 'Placeholder description' },
@@ -40,6 +43,14 @@ const projectRows: ProjectRow[] = [
 ]
 
 function App() {
+  const { isAuthenticated, login, logout } = useAuth()
+  const navigate = useNavigate()
+  const [theme, setTheme] = useState<ThemeMode>(() => {
+    if (typeof window === 'undefined') return 'light'
+    const stored = localStorage.getItem(THEME_KEY)
+    if (stored === 'light' || stored === 'dark') return stored
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
+  })
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [activePage] = useState(1)
@@ -49,12 +60,6 @@ function App() {
     const timer = window.setTimeout(() => setLoading(false), 1000)
     return () => window.clearTimeout(timer)
   }, [])
-
-  const handleRetryProjects = () => {
-    setHasProjectError(false)
-    setLoading(true)
-    window.setTimeout(() => setLoading(false), 500)
-  }
 
   const filteredProjects = useMemo(() => {
     if (!searchTerm.trim()) return projectRows
@@ -68,94 +73,110 @@ function App() {
 
   const visibleRows = filteredProjects.slice((activePage - 1) * 10, activePage * 10)
 
-  return (
+  const handleLogin = () => {
+    login()
+    navigate('/', { replace: true })
+  }
+
+  const dashboard = (
     <div className="app-layout">
       <Sidebar />
       <main className="dashboard-shell">
         <header className="dashboard-header">
           <div>
-            <p className="eyebrow">Placeholder</p>
-            <h1>Placeholder dashboard.</h1>
+            <p className="eyebrow">Overview</p>
+            <h1>Analytics dashboard.</h1>
           </div>
-          <div className="login-pill">Placeholder login</div>
+          <div className="header-actions">
+            <button
+              type="button"
+              className="theme-toggle"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            >
+              {theme === 'dark' ? 'Light mode' : 'Dark mode'}
+            </button>
+            <button type="button" className="logout-button" onClick={() => logout()}>
+              Logout
+            </button>
+          </div>
         </header>
 
-      <section className="stat-grid">
-        {loading
-          ? Array.from({ length: 4 }).map((_, index) => (
-              <article key={index} className="stat-card">
-                <Skeleton height="1.5rem" width="35%" className="skeleton-heading" />
-                <Skeleton height="3rem" width="60%" className="skeleton-value" />
-                <Skeleton height="1rem" width="85%" className="skeleton-text" />
-              </article>
-            ))
-          : statCards.map((stat) => (
-              <article key={stat.label} className="stat-card">
-                <p className="stat-label">{stat.label}</p>
-                <p className="stat-value">{stat.value}</p>
-                <p className="stat-note">{stat.description}</p>
-              </article>
-            ))}
-      </section>
+        <section className="stat-grid">
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <article key={index} className="stat-card">
+                  <Skeleton height="1.5rem" width="35%" className="skeleton-heading" />
+                  <Skeleton height="3rem" width="60%" className="skeleton-value" />
+                  <Skeleton height="1rem" width="85%" className="skeleton-text" />
+                </article>
+              ))
+            : statCards.map((stat) => (
+                <article key={stat.label} className="stat-card">
+                  <p className="stat-label">{stat.label}</p>
+                  <p className="stat-value">{stat.value}</p>
+                  <p className="stat-note">{stat.description}</p>
+                </article>
+              ))}
+        </section>
 
-      <section className="chart-section">
-        <div className="chart-card">
-          <div className="chart-card-header">
-            <p>Placeholder chart</p>
-            <span>Placeholder</span>
-          </div>
-          {loading ? (
-            <Skeleton variant="rect" className="chart-skeleton" />
-          ) : (
-            <div className="chart-placeholder">
-              <div className="chart-point">A</div>
-              <div className="chart-point active">B</div>
-              <div className="chart-point">C</div>
-              <div className="chart-point">D</div>
+        <section className="chart-section">
+          <div className="chart-card">
+            <div className="chart-card-header">
+              <p>Placeholder chart</p>
+              <span>Placeholder</span>
             </div>
-          )}
-        </div>
-
-        <div className="chart-card">
-          <div className="chart-card-header">
-            <p>Placeholder chart</p>
-            <span>Placeholder</span>
+            {loading ? (
+              <Skeleton variant="rect" className="chart-skeleton" />
+            ) : (
+              <div className="chart-placeholder">
+                <div className="chart-point">A</div>
+                <div className="chart-point active">B</div>
+                <div className="chart-point">C</div>
+                <div className="chart-point active">D</div>
+              </div>
+            )}
           </div>
-          {loading ? (
-            <Skeleton variant="rect" className="chart-skeleton" />
-          ) : (
-            <div className="chart-bars">
-              <div>
-                <span>Type A</span>
-                <div className="bar ui" />
-              </div>
-              <div>
-                <span>Type B</span>
-                <div className="bar backend" />
-              </div>
-              <div>
-                <span>Type C</span>
-                <div className="bar ops" />
-              </div>
+
+          <div className="chart-card">
+            <div className="chart-card-header">
+              <p>Placeholder chart</p>
+              <span>Placeholder</span>
             </div>
-          )}
-        </div>
-      </section>
-
-      <section className="table-section">
-        <div className="table-toolbar">
-          <div>
-            <h2>Placeholder table</h2>
-            <p>Placeholder details.</p>
+            {loading ? (
+              <Skeleton variant="rect" className="chart-skeleton" />
+            ) : (
+              <div className="chart-bars">
+                <div>
+                  <span>Type A</span>
+                  <div className="bar ui" />
+                </div>
+                <div>
+                  <span>Type B</span>
+                  <div className="bar backend" />
+                </div>
+                <div>
+                  <span>Type C</span>
+                  <div className="bar ops" />
+                </div>
+              </div>
+            )}
           </div>
-          <input
-            type="search"
-            placeholder="Search"
-            value={searchTerm}
-            onChange={(event) => setSearchTerm(event.target.value)}
-            disabled={loading}
-          />
-        </div>
+        </section>
+
+        <section className="table-section">
+          <div className="table-toolbar">
+            <div>
+              <h2>Placeholder table</h2>
+              <p>Placeholder details.</p>
+            </div>
+            <input
+              type="search"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(event) => setSearchTerm(event.target.value)}
+              disabled={loading}
+            />
+          </div>
 
         <div className="table-card">
           <table>
@@ -196,29 +217,39 @@ function App() {
                       <td>{row.owner}</td>
                       <td>
                         <span className={`status-badge ${row.status.replace(' ', '-').toLowerCase()}`}>
-                          {row.status}
+                          Placeholder
                         </span>
                       </td>
-                      <td>{row.progress}%</td>
+                      <td>00%</td>
                     </tr>
                   ))}
             </tbody>
           </table>
 
-          {!loading && hasProjectError ? (
-            <ErrorState onRetry={handleRetryProjects} />
-          ) : !loading && filteredProjects.length === 0 ? (
-            <EmptyState
-              title="No projects match"
-              description="Try changing your search terms or removing filters to see more projects."
-              actionLabel="Reset search"
-              onAction={() => setSearchTerm('')}
-            />
-          ) : null}
+          {!loading && filteredProjects.length === 0 && (
+            <div className="empty-state">No matches.</div>
+          )}
         </div>
       </section>
     </main>
   </div>
+  )
+
+  return (
+    <Routes>
+      <Route
+        path="/login"
+        element={
+          isAuthenticated ? (
+            <Navigate to="/" replace />
+          ) : (
+            <Login onSuccess={handleLogin} />
+          )
+        }
+      />
+      <Route path="/" element={<ProtectedRoute>{dashboard}</ProtectedRoute>} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
