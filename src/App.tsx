@@ -109,6 +109,7 @@ function App() {
               type="button"
               className="theme-toggle"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              aria-label="Toggle dark mode"
             >
               {theme === 'dark' ? 'Light mode' : 'Dark mode'}
             </button>
