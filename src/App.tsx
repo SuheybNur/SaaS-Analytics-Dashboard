@@ -28,23 +28,23 @@ type ThemeMode = 'light' | 'dark'
 const THEME_KEY = 'saas-dashboard-theme'
 
 const statCards: DashboardStat[] = [
-  { label: 'Metric A', value: '00', description: 'Placeholder description' },
-  { label: 'Metric B', value: '00', description: 'Placeholder description' },
-  { label: 'Metric C', value: '00', description: 'Placeholder description' },
-  { label: 'Metric D', value: '00', description: 'Placeholder description' },
+  { label: 'Monthly Recurring Revenue', value: '$0', description: 'Revenue recognized this month from active subscriptions.' },
+  { label: 'Net MRR Growth', value: '+0%', description: 'Month-over-month expansion and churn net change.' },
+  { label: 'Customer Churn', value: '0.0%', description: 'Percent of customers lost over the past 30 days.' },
+  { label: 'ARR Projection', value: '$0.0M', description: 'Annual revenue run rate based on current subscription bookings.' },
 ]
 
 const projectRows: ProjectRow[] = [
-  { name: 'Item 1', category: 'Type A', owner: 'User A', status: 'Active', progress: 0 },
-  { name: 'Item 2', category: 'Type B', owner: 'User B', status: 'At risk', progress: 0 },
-  { name: 'Item 3', category: 'Type C', owner: 'User C', status: 'Completed', progress: 0 },
-  { name: 'Item 4', category: 'Type D', owner: 'User D', status: 'Active', progress: 0 },
-  { name: 'Item 5', category: 'Type E', owner: 'User E', status: 'Active', progress: 0 },
-  { name: 'Item 6', category: 'Type F', owner: 'User F', status: 'Completed', progress: 0 },
-  { name: 'Item 7', category: 'Type G', owner: 'User G', status: 'At risk', progress: 0 },
-  { name: 'Item 8', category: 'Type H', owner: 'User H', status: 'Active', progress: 0 },
-  { name: 'Item 9', category: 'Type I', owner: 'User I', status: 'Completed', progress: 0 },
-  { name: 'Item 10', category: 'Type J', owner: 'User J', status: 'Active', progress: 0 },
+  { name: 'Onboarding Launch', category: 'Customer Success', owner: 'Lena Patel', status: 'Active', progress: 68 },
+  { name: 'Renewal Campaign', category: 'Growth', owner: 'Marcus Reed', status: 'At risk', progress: 42 },
+  { name: 'Product Release', category: 'Engineering', owner: 'Nina Chen', status: 'Completed', progress: 100 },
+  { name: 'Churn Analysis', category: 'Analytics', owner: 'Priya Singh', status: 'Active', progress: 55 },
+  { name: 'Pricing Review', category: 'Finance', owner: 'Omar Diaz', status: 'Active', progress: 73 },
+  { name: 'Support SLA Audit', category: 'Operations', owner: 'Mia Brooks', status: 'Completed', progress: 100 },
+  { name: 'Feature Adoption', category: 'Product', owner: 'Ethan Cole', status: 'At risk', progress: 39 },
+  { name: 'Campaign Tracking', category: 'Marketing', owner: 'Sara Kim', status: 'Active', progress: 82 },
+  { name: 'Usage Review', category: 'Customer Success', owner: 'Noah Grant', status: 'Completed', progress: 100 },
+  { name: 'Referral Boost', category: 'Growth', owner: 'Ava Moore', status: 'Active', progress: 61 },
 ]
 
 function App() {
@@ -109,7 +109,6 @@ function App() {
               type="button"
               className="theme-toggle"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              aria-label="Toggle dark mode"
             >
               {theme === 'dark' ? 'Light mode' : 'Dark mode'}
             </button>
@@ -140,8 +139,8 @@ function App() {
         <section className="chart-section">
           <div className="chart-card">
             <div className="chart-card-header">
-              <p>Placeholder chart</p>
-              <span>Placeholder</span>
+              <p>Weekly active accounts</p>
+              <span>Accounts</span>
             </div>
             {loading ? (
               <Skeleton variant="rect" className="chart-skeleton" />
@@ -157,23 +156,23 @@ function App() {
 
           <div className="chart-card">
             <div className="chart-card-header">
-              <p>Placeholder chart</p>
-              <span>Placeholder</span>
+              <p>Support tickets by plan</p>
+              <span>Plan distribution</span>
             </div>
             {loading ? (
               <Skeleton variant="rect" className="chart-skeleton" />
             ) : (
               <div className="chart-bars">
                 <div>
-                  <span>Type A</span>
+                  <span>Starter</span>
                   <div className="bar ui" />
                 </div>
                 <div>
-                  <span>Type B</span>
+                  <span>Professional</span>
                   <div className="bar backend" />
                 </div>
                 <div>
-                  <span>Type C</span>
+                  <span>Enterprise</span>
                   <div className="bar ops" />
                 </div>
               </div>
@@ -184,12 +183,12 @@ function App() {
         <section className="table-section">
           <div className="table-toolbar">
             <div>
-              <h2>Placeholder table</h2>
-              <p>Placeholder details.</p>
+              <h2>Customer success roadmap</h2>
+              <p>Track launches, renewals, and engagement campaigns across teams.</p>
             </div>
             <input
               type="search"
-              placeholder="Search"
+              placeholder="Search initiatives"
               value={searchTerm}
               onChange={(event) => setSearchTerm(event.target.value)}
               disabled={loading}
