@@ -7,6 +7,7 @@ import EmptyState from './components/EmptyState'
 import ErrorState from './components/ErrorState'
 import Login from './components/Login'
 import ProtectedRoute from './components/ProtectedRoute'
+import WeeklyProgressChart from './components/WeeklyProgressChart'
 import { useAuth } from './auth/useAuth'
 
 type DashboardStat = {
@@ -137,22 +138,13 @@ function App() {
         </section>
 
         <section className="chart-section">
-          <div className="chart-card">
-            <div className="chart-card-header">
-              <p>Weekly active accounts</p>
-              <span>Accounts</span>
-            </div>
-            {loading ? (
+          {loading ? (
+            <div className="chart-card">
               <Skeleton variant="rect" className="chart-skeleton" />
-            ) : (
-              <div className="chart-placeholder">
-                <div className="chart-point">A</div>
-                <div className="chart-point active">B</div>
-                <div className="chart-point">C</div>
-                <div className="chart-point active">D</div>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <WeeklyProgressChart />
+          )}
 
           <div className="chart-card">
             <div className="chart-card-header">
