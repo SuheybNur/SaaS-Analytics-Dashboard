@@ -7,7 +7,9 @@ import EmptyState from './components/EmptyState'
 import ErrorState from './components/ErrorState'
 import Login from './components/Login'
 import ProtectedRoute from './components/ProtectedRoute'
+import TaskCategoryBarChart from './components/TaskCategoryBarChart'
 import WeeklyProgressChart from './components/WeeklyProgressChart'
+import StatCard from './components/StatCard'
 import { useAuth } from './auth/useAuth'
 
 type DashboardStat = {
@@ -28,11 +30,11 @@ type ThemeMode = 'light' | 'dark'
 
 const THEME_KEY = 'saas-dashboard-theme'
 
-const statCards: DashboardStat[] = [
-  { label: 'Monthly Recurring Revenue', value: '$0', description: 'Revenue recognized this month from active subscriptions.' },
-  { label: 'Net MRR Growth', value: '+0%', description: 'Month-over-month expansion and churn net change.' },
-  { label: 'Customer Churn', value: '0.0%', description: 'Percent of customers lost over the past 30 days.' },
-  { label: 'ARR Projection', value: '$0.0M', description: 'Annual revenue run rate based on current subscription bookings.' },
+const kpiStats: DashboardStat[] = [
+  { label: 'Total Projects', value: '24', description: 'Total projects in the workspace.' },
+  { label: 'Active Tasks', value: '12', description: 'Tasks currently active across projects.' },
+  { label: 'Team Members', value: '8', description: 'People contributing to projects.' },
+  { label: 'Completion Rate', value: '76%', description: 'Overall task completion rate.' },
 ]
 
 const projectRows: ProjectRow[] = [
@@ -128,12 +130,8 @@ function App() {
                   <Skeleton height="1rem" width="85%" className="skeleton-text" />
                 </article>
               ))
-            : statCards.map((stat) => (
-                <article key={stat.label} className="stat-card">
-                  <p className="stat-label">{stat.label}</p>
-                  <p className="stat-value">{stat.value}</p>
-                  <p className="stat-note">{stat.description}</p>
-                </article>
+            : kpiStats.map((stat) => (
+                <StatCard key={stat.label} label={stat.label} value={stat.value} description={stat.description} />
               ))}
         </section>
 
