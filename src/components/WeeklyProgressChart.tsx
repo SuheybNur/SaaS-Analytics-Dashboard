@@ -25,7 +25,7 @@ const axisTickStyle = {
 
 export default function WeeklyProgressChart() {
   return (
-    <section className="rounded-[24px] border border-slate-200/70 bg-white/95 p-6 shadow-[0_24px_80px_rgba(20,23,55,0.08)] transition-colors duration-200 dark:border-slate-700/70 dark:bg-slate-950/85 dark:shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+    <section className="chart-card">
       <div className="mb-5 flex flex-col gap-2">
         <span className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500 dark:text-slate-400">
           Weekly progress
