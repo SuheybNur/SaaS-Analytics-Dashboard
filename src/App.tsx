@@ -7,6 +7,7 @@ import EmptyState from './components/EmptyState'
 import ErrorState from './components/ErrorState'
 import Login from './components/Login'
 import ProtectedRoute from './components/ProtectedRoute'
+import TaskCategoryBarChart from './components/TaskCategoryBarChart'
 import WeeklyProgressChart from './components/WeeklyProgressChart'
 import StatCard from './components/StatCard'
 import { useAuth } from './auth/useAuth'
@@ -145,26 +146,13 @@ function App() {
 
           <div className="chart-card">
             <div className="chart-card-header">
-              <p>Support tickets by plan</p>
-              <span>Plan distribution</span>
+              <p>Tasks by category</p>
+              <span>Current work distribution</span>
             </div>
             {loading ? (
               <Skeleton variant="rect" className="chart-skeleton" />
             ) : (
-              <div className="chart-bars">
-                <div>
-                  <span>Starter</span>
-                  <div className="bar ui" />
-                </div>
-                <div>
-                  <span>Professional</span>
-                  <div className="bar backend" />
-                </div>
-                <div>
-                  <span>Enterprise</span>
-                  <div className="bar ops" />
-                </div>
-              </div>
+              <TaskCategoryBarChart />
             )}
           </div>
         </section>
