@@ -28,7 +28,20 @@ type ProjectRow = {
 
 type ThemeMode = 'light' | 'dark'
 
+type SortKey = keyof ProjectRow
+type SortDirection = 'asc' | 'desc'
+type SortState = { key: SortKey; direction: SortDirection }
+
 const THEME_KEY = 'saas-dashboard-theme'
+const PAGE_SIZE = 10
+
+const columns: { key: SortKey; label: string }[] = [
+  { key: 'name', label: 'Item' },
+  { key: 'category', label: 'Type' },
+  { key: 'owner', label: 'Owner' },
+  { key: 'status', label: 'State' },
+  { key: 'progress', label: 'Rate' },
+]
 
 const kpiStats: DashboardStat[] = [
   { label: 'Total Projects', value: '24', description: 'Total projects in the workspace.' },
@@ -48,6 +61,18 @@ const projectRows: ProjectRow[] = [
   { name: 'Campaign Tracking', category: 'Marketing', owner: 'Sara Kim', status: 'Active', progress: 82 },
   { name: 'Usage Review', category: 'Customer Success', owner: 'Noah Grant', status: 'Completed', progress: 100 },
   { name: 'Referral Boost', category: 'Growth', owner: 'Ava Moore', status: 'Active', progress: 61 },
+  { name: 'Data Migration', category: 'Engineering', owner: 'Liam Foster', status: 'Active', progress: 47 },
+  { name: 'NPS Survey', category: 'Analytics', owner: 'Zoe Bennett', status: 'Completed', progress: 100 },
+  { name: 'Billing Revamp', category: 'Finance', owner: 'Kai Nguyen', status: 'At risk', progress: 34 },
+  { name: 'Docs Overhaul', category: 'Product', owner: 'Ruby Shah', status: 'Active', progress: 58 },
+  { name: 'Partner Portal', category: 'Growth', owner: 'Leo Martins', status: 'Active', progress: 71 },
+  { name: 'Incident Review', category: 'Operations', owner: 'Ivy Turner', status: 'Completed', progress: 100 },
+  { name: 'Mobile Rollout', category: 'Engineering', owner: 'Jack Owens', status: 'At risk', progress: 45 },
+  { name: 'Email Sequences', category: 'Marketing', owner: 'Mila Rossi', status: 'Active', progress: 66 },
+  { name: 'Health Scoring', category: 'Customer Success', owner: 'Ezra Cole', status: 'Active', progress: 52 },
+  { name: 'Quarterly Review', category: 'Finance', owner: 'Nora Diaz', status: 'Completed', progress: 100 },
+  { name: 'Access Controls', category: 'Operations', owner: 'Finn Walsh', status: 'Active', progress: 63 },
+  { name: 'Roadmap Planning', category: 'Product', owner: 'Aria Khan', status: 'At risk', progress: 40 },
 ]
 
 function App() {
@@ -61,7 +86,8 @@ function App() {
   })
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activePage] = useState(1)
+  const [sort, setSort] = useState<SortState | null>(null)
+  const [activePage, setActivePage] = useState(1)
   const [hasProjectError, setHasProjectError] = useState(false)
 
   useEffect(() => {
@@ -81,17 +107,48 @@ function App() {
     window.setTimeout(() => setLoading(false), 500)
   }
 
-  const filteredProjects = useMemo(() => {
-    if (!searchTerm.trim()) return projectRows
-    return projectRows.filter((row) =>
-      [row.name, row.category, row.owner, row.status]
-        .join(' ')
-        .toLowerCase()
-        .includes(searchTerm.toLowerCase()),
-    )
-  }, [searchTerm])
+  // Sort first, then filter, so the chosen sort order is maintained while filtering.
+  const sortedProjects = useMemo(() => {
+    if (!sort) return projectRows
+    const factor = sort.direction === 'asc' ? 1 : -1
+    return [...projectRows].sort((a, b) => {
+      const aValue = a[sort.key]
+      const bValue = b[sort.key]
+      if (typeof aValue === 'number' && typeof bValue === 'number') {
+        return (aValue - bValue) * factor
+      }
+      return String(aValue).localeCompare(String(bValue)) * factor
+    })
+  }, [sort])
 
-  const visibleRows = filteredProjects.slice((activePage - 1) * 10, activePage * 10)
+  const filteredProjects = useMemo(() => {
+    const query = searchTerm.trim().toLowerCase()
+    if (!query) return sortedProjects
+    return sortedProjects.filter((row) => row.name.toLowerCase().includes(query))
+  }, [sortedProjects, searchTerm])
+
+  const pageCount = Math.max(1, Math.ceil(filteredProjects.length / PAGE_SIZE))
+  // Clamp during render so the page stays valid when the filtered set shrinks.
+  const currentPage = Math.min(activePage, pageCount)
+
+  const visibleRows = filteredProjects.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+
+  const rangeStart = filteredProjects.length === 0 ? 0 : (currentPage - 1) * PAGE_SIZE + 1
+  const rangeEnd = Math.min(currentPage * PAGE_SIZE, filteredProjects.length)
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value)
+    setActivePage(1)
+  }
+
+  const handleSort = (key: SortKey) => {
+    setSort((current) => {
+      if (current?.key === key) {
+        return { key, direction: current.direction === 'asc' ? 'desc' : 'asc' }
+      }
+      return { key, direction: 'asc' }
+    })
+  }
 
   const handleLogin = () => {
     login()
@@ -165,9 +222,10 @@ function App() {
             </div>
             <input
               type="search"
-              placeholder="Search initiatives"
+              placeholder="Search by project name"
+              aria-label="Search projects by name"
               value={searchTerm}
-              onChange={(event) => setSearchTerm(event.target.value)}
+              onChange={(event) => handleSearchChange(event.target.value)}
               disabled={loading}
             />
           </div>
@@ -176,11 +234,29 @@ function App() {
             <table>
               <thead>
                 <tr>
-                  <th>Item</th>
-                  <th>Type</th>
-                  <th>Owner</th>
-                  <th>State</th>
-                  <th>Rate</th>
+                  {columns.map((column) => {
+                    const isSorted = sort?.key === column.key
+                    return (
+                      <th
+                        key={column.key}
+                        aria-sort={
+                          isSorted ? (sort?.direction === 'asc' ? 'ascending' : 'descending') : 'none'
+                        }
+                      >
+                        <button
+                          type="button"
+                          className={`th-sort ${isSorted ? 'active' : ''}`}
+                          onClick={() => handleSort(column.key)}
+                          disabled={loading}
+                        >
+                          <span>{column.label}</span>
+                          <span className="sort-indicator" aria-hidden="true">
+                            {isSorted ? (sort?.direction === 'asc' ? '▲' : '▼') : '↕'}
+                          </span>
+                        </button>
+                      </th>
+                    )
+                  })}
                 </tr>
               </thead>
               <tbody>
@@ -227,10 +303,39 @@ function App() {
                 title="No projects match"
                 description="Try changing your search terms or removing filters to see more projects."
                 actionLabel="Reset search"
-                onAction={() => setSearchTerm('')}
+                onAction={() => handleSearchChange('')}
               />
             ) : null}
           </div>
+
+          {!loading && !hasProjectError && filteredProjects.length > 0 && (
+            <div className="table-pagination">
+              <p className="pagination-label">
+                Showing {rangeStart}-{rangeEnd} of {filteredProjects.length}
+              </p>
+              <div className="pagination-controls">
+                <button
+                  type="button"
+                  className="pagination-button"
+                  onClick={() => setActivePage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                >
+                  Prev
+                </button>
+                <span className="pagination-page">
+                  Page {currentPage} of {pageCount}
+                </span>
+                <button
+                  type="button"
+                  className="pagination-button"
+                  onClick={() => setActivePage(Math.min(pageCount, currentPage + 1))}
+                  disabled={currentPage >= pageCount}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </section>
       </main>
     </div>
