@@ -1,73 +1,60 @@
-# React + TypeScript + Vite
+# SaaS Analytics Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A polished analytics dashboard experience built with React and TypeScript. The app presents project health, task distribution, and roadmap progress in a modern interface with built-in light and dark mode support.
 
-Currently, two official plugins are available:
+## Screenshots
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+The dashboard includes both light and dark visual themes for the same experience:
 
-## React Compiler
+### Light mode
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+![Light mode dashboard](public/screenshots/light-mode.png)
 
-## Expanding the ESLint configuration
+### Dark mode
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+![Dark mode dashboard](public/screenshots/dark-mode.png)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React 19 + TypeScript
+- Vite for development and production builds
+- React Router for protected routes and auth flow
+- Recharts for data visualization
+- Tailwind CSS for styling and theme support
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## How to run locally
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+2. Start the development server:
+   ```bash
+   npm run dev
+   ```
+3. Open the local app at:
+   ```text
+   http://localhost:3000/
+   ```
+4. Sign in with any valid email address and a password with at least 8 characters.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Design decisions
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- A clean, dashboard-first layout keeps key KPIs and charts visible without overwhelming the user.
+- Protected routing ensures the main dashboard is only accessible after sign-in.
+- Skeleton states and lightweight transitions make the UI feel responsive while content loads.
+- A built-in theme toggle supports both light and dark viewing preferences.
+- The project uses a component-driven structure so charts, cards, and tables can be reused and extended easily.
+
+## Known trade-offs
+
+- The app currently uses mock dashboard data rather than a live backend or API integration.
+- Authentication is intentionally lightweight and persisted through browser storage for demo purposes.
+- The table and charts are designed for a polished presentation rather than full production-scale data handling.
+- There is no automated test suite yet, so visual verification remains the main quality check during iteration.
+
+## Build for production
+
+```bash
+npm run build
 ```
