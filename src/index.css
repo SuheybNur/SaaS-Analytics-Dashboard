@@ -54,12 +54,12 @@ html.dark {
   width: 100%;
   max-width: none;
   margin: 0;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  text-align: left;
+  border-inline: none;
   min-height: 100svh;
   display: flex;
   flex-direction: column;
-  padding-inline: 12px;
+  padding-inline: 0;
 }
 
 body {

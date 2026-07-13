@@ -145,6 +145,7 @@ input {
   margin: 0;
   padding: 32px 24px 48px;
   box-sizing: border-box;
+  min-width: 0;
 }
 
 .dashboard-header {
@@ -325,6 +326,7 @@ input {
   justify-content: space-between;
   gap: 20px;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .table-toolbar h2 {
@@ -343,6 +345,98 @@ input {
   padding: 14px 16px;
   background: var(--surface);
   color: var(--text);
+}
+
+@media (max-width: 1023px) {
+  .app-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .dashboard-shell {
+    padding: 84px 16px 40px;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-shell {
+    padding: 78px 14px 36px;
+  }
+
+  .stat-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .chart-section {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card,
+  .stat-card,
+  .table-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .chart-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-toolbar input {
+    width: 100%;
+  }
+
+  .table-pagination {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-shell {
+    padding: 74px 12px 32px;
+  }
+
+  .stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-header h1 {
+    font-size: clamp(1.6rem, 6vw, 2.1rem);
+  }
+
+  .theme-toggle,
+  .logout-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .header-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  th,
+  td {
+    padding: 14px 12px;
+  }
 }
 
 .table-card {
