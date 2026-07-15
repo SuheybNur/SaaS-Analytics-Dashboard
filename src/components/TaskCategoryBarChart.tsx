@@ -24,7 +24,7 @@ const axisTickStyle = {
 export default function TaskCategoryBarChart() {
   return (
     <div className="grid gap-5">
-      <div className="h-[280px] w-full">
+      <div className="h-[220px] w-full sm:h-[260px] lg:h-[280px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={taskCategoryData}
@@ -67,7 +67,7 @@ export default function TaskCategoryBarChart() {
         </ResponsiveContainer>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {taskCategoryData.map((entry) => (
           <div key={entry.category} className="flex items-center gap-2 text-sm text-slate-900 dark:text-slate-100">
             <span
