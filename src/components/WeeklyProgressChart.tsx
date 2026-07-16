@@ -39,7 +39,7 @@ export default function WeeklyProgressChart() {
       </div>
 
       <div className="h-[240px] w-full sm:h-[280px] lg:h-[320px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <LineChart data={weeklyProgressData} margin={{ top: 16, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.24)" vertical={false} />
             <XAxis

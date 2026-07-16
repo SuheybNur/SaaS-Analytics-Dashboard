@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { Suspense, lazy, useEffect, useMemo, useState } from 'react'
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import './App.css'
 import Sidebar from './components/Sidebar'
@@ -7,8 +7,8 @@ import EmptyState from './components/EmptyState'
 import ErrorState from './components/ErrorState'
 import Login from './components/Login'
 import ProtectedRoute from './components/ProtectedRoute'
-import TaskCategoryBarChart from './components/TaskCategoryBarChart'
-import WeeklyProgressChart from './components/WeeklyProgressChart'
+const TaskCategoryBarChart = lazy(() => import('./components/TaskCategoryBarChart'))
+const WeeklyProgressChart = lazy(() => import('./components/WeeklyProgressChart'))
 import StatCard from './components/StatCard'
 import { useAuth } from './auth/useAuth'
 
@@ -198,7 +198,9 @@ function App() {
               <Skeleton variant="rect" className="chart-skeleton" />
             </div>
           ) : (
-            <WeeklyProgressChart />
+            <Suspense fallback={<div className="chart-card"><Skeleton variant="rect" className="chart-skeleton" /></div>}>
+              <WeeklyProgressChart />
+            </Suspense>
           )}
 
           <div className="chart-card">
@@ -209,7 +211,9 @@ function App() {
             {loading ? (
               <Skeleton variant="rect" className="chart-skeleton" />
             ) : (
-              <TaskCategoryBarChart />
+              <Suspense fallback={<Skeleton variant="rect" className="chart-skeleton" />}>
+                <TaskCategoryBarChart />
+              </Suspense>
             )}
           </div>
         </section>

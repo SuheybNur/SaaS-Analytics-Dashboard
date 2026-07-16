@@ -25,7 +25,7 @@ export default function TaskCategoryBarChart() {
   return (
     <div className="grid gap-5">
       <div className="h-[220px] w-full sm:h-[260px] lg:h-[280px]">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minWidth={0} minHeight={0}>
           <BarChart
             data={taskCategoryData}
             margin={{ top: 20, right: 12, left: 0, bottom: 0 }}
