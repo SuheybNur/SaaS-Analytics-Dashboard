@@ -57,9 +57,11 @@ export default function Login({ onSuccess }: LoginProps) {
         </div>
 
         <form className="login-form" onSubmit={handleSubmit} noValidate>
-          <label className="form-field">
+          <label className="form-field" htmlFor="email">
             <span className="field-label">Email</span>
             <input
+              id="email"
+              name="email"
               type="email"
               value={email}
               onChange={(event) => setEmail(event.target.value)}
@@ -67,13 +69,16 @@ export default function Login({ onSuccess }: LoginProps) {
               className={errors.email ? 'input invalid' : 'input'}
               aria-invalid={Boolean(errors.email)}
               aria-describedby={errors.email ? 'email-error' : undefined}
+              autoComplete="email"
             />
             {errors.email && <p id="email-error" className="input-error">{errors.email}</p>}
           </label>
 
-          <label className="form-field">
+          <label className="form-field" htmlFor="password">
             <span className="field-label">Password</span>
             <input
+              id="password"
+              name="password"
               type="password"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
@@ -81,6 +86,7 @@ export default function Login({ onSuccess }: LoginProps) {
               className={errors.password ? 'input invalid' : 'input'}
               aria-invalid={Boolean(errors.password)}
               aria-describedby={errors.password ? 'password-error' : undefined}
+              autoComplete="current-password"
             />
             {errors.password && <p id="password-error" className="input-error">{errors.password}</p>}
           </label>
